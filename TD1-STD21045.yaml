@@ -1,0 +1,319 @@
+---
+openapi: 3.0.1
+info:
+  title: STD21045
+  description: Hello world ! This is my first openapi spec
+  version: 1.0.0-oas3
+servers:
+- url: https://std21045.mg
+- url: http://std21045.mg
+tags:
+- name: Students
+- name: Courses
+paths:
+  /students/{id}:
+    get:
+      tags:
+      - Students
+      summary: Get a specific student by his id
+      description: Require id to get a specific Student
+      operationId: getStudentById
+      parameters:
+      - name: id
+        in: path
+        description: student's id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Students'
+        "400":
+          description: Bad request
+  /students:
+    get:
+      tags:
+      - Students
+      summary: Get all students
+      operationId: getStudents
+      parameters:
+      - name: page
+        in: query
+        description: page's number
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int
+      - name: page-size
+        in: query
+        description: page's size
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Bad request
+        "403":
+          description: Forbidden
+    post:
+      tags:
+      - Students
+      summary: Create a new student
+      operationId: createStudent
+      parameters:
+      - name: lastname
+        in: query
+        description: Student's lastname
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: firstname
+        in: query
+        description: Student's firstname
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: birthdate
+        in: query
+        description: Student's birthdate
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+      - name: gender
+        in: query
+        description: Student's gender
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: char
+      - name: email
+        in: query
+        description: Student's email
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/students_body'
+        required: true
+      responses:
+        "201":
+          description: created
+          content: {}
+        "405":
+          description: Invalid input
+          content: {}
+  /courses:
+    get:
+      tags:
+      - Courses
+      summary: Get a list of all courses
+      operationId: getCourses
+      parameters:
+      - name: page
+        in: query
+        description: page's number
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int
+      - name: page-size
+        in: query
+        description: page's size
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+          format: int
+      responses:
+        "200":
+          description: List course
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Error'
+    post:
+      tags:
+      - Courses
+      summary: Create a new course
+      operationId: createCourse
+      parameters:
+      - name: course_name
+        in: query
+        description: Course's name
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: teacher_name
+        in: query
+        description: Teacher's name
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: createdDatetime
+        in: query
+        description: Course's creation datetime
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/courses_body'
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Success'
+        "400":
+          description: Bad request
+  /courses/{id}:
+    get:
+      tags:
+      - Courses
+      summary: Get a specific course by its id
+      operationId: getCourseById
+      parameters:
+      - name: id
+        in: path
+        description: course's id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+          format: int
+      responses:
+        "200":
+          description: The specific course is shown
+        "400":
+          description: Bad request
+components:
+  schemas:
+    Students:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 44
+        lastname:
+          type: string
+          example: Ny Tiana Andriantsoa
+        firstname:
+          type: string
+          example: Fifaliana Loica
+        birthdate:
+          type: string
+          format: date
+          example: 1999-08-05
+        gender:
+          type: string
+          example: M
+        email:
+          type: string
+          example: hei.loica.2@gmail.com
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: 400_BAD_REQUEST
+        message:
+          type: string
+          example: Parameters are missing
+    Success:
+      type: object
+      properties:
+        message:
+          type: string
+          example: 201_CREATED
+    students_body:
+      properties:
+        lastname:
+          type: string
+          description: lastName of the student
+          example: Rajemisa
+        firstname:
+          type: string
+          description: firstName of the student
+          example: Sanda Mandresy
+        birthdate:
+          type: string
+          description: birthdate of the student
+          example: 2022-07-13
+        gender:
+          type: string
+          description: gender of the student
+          example: M
+        email:
+          type: string
+          description: email of the student
+          example: hei.sanda.3@gmail.com
+    courses_body:
+      properties:
+        id:
+          type: number
+          description: Course's id
+          example: 5
+        name:
+          type: string
+          description: name of the course
+          example: IA2
+        teacher:
+          type: string
+          description: name of the teacher
+          example: Pr Robotnik
+        createdDatetime:
+          type: string
+          description: creation date of the course
+          format: date
+          example: 2022-07-13
