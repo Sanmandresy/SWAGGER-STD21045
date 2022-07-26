@@ -1,0 +1,746 @@
+---
+openapi: 3.0.1
+info:
+  title: STD21045
+  description: An API that specifies the management inside a movie theater. A is one and B is two by the way.
+  version: 1.0.0-oas3
+servers:
+  - url: https://std21045.mg
+  - url: http://std21045.mg
+tags:
+  - name : Rooms
+  - name : Movies
+  - name : Projections
+  - name : Categories
+paths:
+  /rooms:
+    get:
+      tags:
+        - Rooms
+      summary: Get all the movie theater's rooms.
+      description: A list of all the rooms and their specifications will be displayed.
+      operationId: getRooms
+      responses:
+        200:
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Rooms'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Forbidden'
+
+  /rooms/{id}:
+    get:
+      tags:
+        - Rooms
+      summary: Get a specific room by its id
+      description: Only the room with the id in path will de displayed
+      operationId: GetRoomById
+      parameters:
+        - name : id
+          in: path
+          description: room's id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Room'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BadRequest'
+                
+
+
+  /movies/{page}:
+    get:
+      tags:
+        - Movies
+      summary: Get a list of every movies available. 
+      description: All movies available in the movie theatre.
+      operationId: getMoviesList
+      parameters:
+        - name : page
+          in : path
+          description: the list has a pagination so the page number is required.
+          required: true
+          schema:
+            type: number
+            format: int32
+      responses:
+        200:
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/List'
+        400:
+          description: Bad request
+          
+  /movies:
+    post:
+      tags:
+        - Movies
+      summary: Add a movie to the theater's list. 
+      description: Create a new movie inside the list.
+      operationId: AddMovie
+      requestBody:
+        required : true
+        content:
+         application/json:
+          schema:
+            type: object
+            $ref : '#/components/schemas/NewMovie'
+
+      responses:
+        200:
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+        
+    
+  /movies/{id}:
+    get:
+      tags:
+        - Movies
+      summary: Get a specific movie by its id
+      description: An id is required for getting informations about a movie
+      operationId: getMovieById
+      parameters:
+        - name: id
+          in: path
+          description: movie's id
+          required: true
+          schema:
+            type: number
+            format: int32
+      responses:
+        200:
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref : "#/components/schemas/Movie"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BadRequest'
+    delete:
+      tags:
+        - Movies
+      summary: Delete a specific movie by its id
+      description: An id is required for removing a movie from the list
+      operationId: removeMovieById
+      parameters:
+        - name: id
+          in: path
+          description: movie's id
+          required: true
+          schema:
+            type: number
+            format: int32
+      responses:
+        200:
+          description: Request successful
+          content: 
+            text/plain :
+              schema :
+                $ref : "#/components/schemas/Deleted"           
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BadRequest'
+    put:
+     tags:
+      - Movies
+     summary: Modify a movie's informations
+     description : Require the movie's id
+     operationId: updateMovie
+     parameters:
+        - name : id
+          in : path
+          description: movie's id
+          required: true
+          schema:
+            type: integer
+            format: int
+     requestBody:
+       required : true
+       content:
+         application/json:
+          schema:
+            $ref: "#/components/schemas/NewMovie"
+     responses:
+        200:
+          description: Movie has been updated
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Movie'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BadRequest'
+
+  /projections/{page}:
+    get:
+      tags:
+        - Projections
+      summary: Get a list of every projections available. 
+      description: All projections available in the movie theatre.
+      operationId: getProjectionList
+      parameters:
+        - name : page
+          in : path
+          description: the list has a pagination so the page number is required.
+          required: true
+          schema:
+            type: number
+            format: int32
+      responses:
+        200:
+          description: Request successful
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/Projections'
+        400:
+          description: Bad request
+    delete:
+      tags:
+        - Projections
+      summary : Delete a list of projections per page
+      description: page is required for deleting some projections
+      operationId: deleteProjectionsPerPage
+      parameters:
+        - name : page
+          in : path
+          description: the list has a pagination so the page number is required.
+          required: true
+          schema:
+            type: number
+            format: int64
+      responses:
+        200:
+          description: Request successful
+          content:
+            text/plain :
+              schema :
+                $ref : "#/components/schemas/Deleted"  
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BadRequest'
+  /projections/{id}:
+    delete:
+      tags:
+        - Projections
+      summary : Delete a specific projection by its id
+      description: id is required for the process
+      operationId: deleteProjectionsByID
+      parameters:
+        - name : id
+          in : path
+          required: true
+          schema:
+            type: number
+            format: int64
+      responses:
+        200:
+          description: Request successful
+          content:
+            text/plain :
+              schema :
+                $ref : "#/components/schemas/Deleted"  
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BadRequest'
+    get:
+      tags:
+        - Projections
+      summary : Get a specific projection by its id
+      description: id is required for the process
+      operationId: getProjectionsByID
+      parameters:
+        - name : id
+          in : path
+          required: true
+          schema:
+            type: number
+            format: int64
+      responses:
+        200:
+          description: Request successful
+          content:
+            application/json: 
+              schema :
+                type: object
+                $ref : "#/components/schemas/Projection"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BadRequest'
+    put:
+      tags:
+        - "Projections"
+      summary: Modify the projection's informations
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        description: update projection
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProjection'
+        required: true
+      responses:
+        200:
+          description: Updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewProjectionWithId'
+        400:
+          description: Error
+          content: {}     
+    patch:
+      tags:
+        - "Projections"
+      summary: Change projection's informations but partially
+      description: |
+        We can only change these :
+          * movie_id
+          * room_id
+          * hour
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProjection'  
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projection'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BadRequest'
+
+  /categories:
+    get:
+      tags:
+        - "Categories"
+      summary: Get the list of every categories
+      operationId: getCategories
+      responses:
+        200:
+          description: List diplayed
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Categories'
+    post:
+      tags:
+        - "Categories"
+      summary: Add a new category to the list
+      requestBody:
+        content:
+          application/json:
+            schema:
+             type: object
+             $ref: "#/components/schemas/NewCategory"
+            
+      responses:
+        200:
+          description: New category added
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/NewCategory'
+  /categories?name:
+    get:
+      tags:
+        - "Categories"
+      summary: Get a movie with the specified category
+      operationId: getMovieByCategory
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+            example : "Biopic"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/NewCategory'
+    delete:
+      tags:
+        - "Categories"
+      summary: Remove a category by giving its name
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          required: true
+      responses:
+        200:
+          description: Success
+          content:
+            text/plain:
+              schema:
+               $ref: "#/components/schemas/Deleted"
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BadRequest'
+         
+     
+
+components:
+  schemas:
+
+    Room:
+      type: object
+      properties:
+        id:
+          type: string
+          example : A
+        reception_capacity:
+          type: number
+          example: 300
+
+    Rooms:
+      type: object
+      properties:
+        id:
+          type: string
+        reception_capacity:
+          type: number
+      example:
+        - id: A
+          reception_capacity: 300
+        - id: B
+          reception_capacity: 250
+
+    List:
+      type: object
+      properties:
+        id :
+          type: number
+        title :
+          type: string
+        duration:
+          type: number
+          format: hour
+        summary:
+          type: string
+        director:
+          type: string
+          format: name
+        release_date:
+          type: string
+          format: date
+      example:
+        - id : 1
+          title: The Man from Toronto
+          duration: 1h 52m
+          summary: | 
+            A case of mistaken identity forces a 
+             bumbling entrepreneur to team up with a 
+             notorious assassin in hopes of staying alive.
+          director: Patrick Hughes
+          release_date: 2022-06-24
+
+        - id : 2
+          title: Bullet Train
+          duration: 2h 6m
+          summary: |
+            Five assassins find themselves on a fast moving bullet 
+             train from Tokyo to Morioka with only a few stops in between. 
+             They discover their missions are not unrelated to each other.
+          director: David Leitch
+          release_date: 2022-08-05
+
+        - id : 3
+          title: The Gray Man
+          duration: 2h 2m
+          summary:  |
+            When the CIA's top asset -- 
+             his identity known to no one -- 
+             uncovers agency secrets, he triggers a global hunt 
+             by assassins set loose by his ex-colleague.
+          director: Joe Russo
+          release_date: 2022-07-22
+
+
+    NewMovie:
+      type: object
+      properties:
+        title :
+          type: string
+        duration:
+          type: number
+          format: hour
+        summary:
+          type: string
+        director:
+          type: string
+          format: name
+        release_date:
+          type: string
+          format: date
+      example :
+        - title : Don't Make Me Go
+          duration: 1h 49m
+          summary: |
+            A terminally ill man and his teenage daughter 
+             embark on a road trip from California to New Orleans 
+             for his 20th college reunion. While there, he secretly hopes she can reunite with the mother who left them long ago.
+          director: Hannah Marks
+          release_date: 2022-06-13
+
+    Movie:
+      type: object
+      properties:
+          id:
+            type: number
+          title :
+            type: string
+          duration:
+            type: number
+            format: hour
+          summary:
+            type: string
+          director:
+            type: string
+            format: name
+          release_date:
+            type: string
+            format: date
+      example :
+        - id : 4
+          title : Don't Make Me Go
+          duration: 1h 49m
+          summary: |
+            A terminally ill man and his teenage daughter 
+             embark on a road trip from California to New Orleans 
+             for his 20th college reunion. While there, he secretly hopes she can reunite with the mother who left them long ago.
+          director: Hannah Marks
+          release_date: 2022-06-13
+
+    Projection:
+      type: object
+      properties:
+        id :
+          type : number
+        movie :
+          type: string
+        room :
+          type: string
+        projection_time:
+          type: string
+          format: time
+      example:
+        - id : 1
+          movie : Black Adam
+          room : A
+          projection_time: 7h 30mn
+
+    NewProjection:
+      type: object
+      properties:
+        movie :
+          type: string
+        room :
+          type: string
+        projection_time:
+          type: string
+          format: time
+      example:
+          movie : Get Out
+          room : B
+          projection_time: 21h 30mn
+    NewProjectionWithId:
+      type: object
+      properties:
+        id :
+          type: number
+        movie :
+          type: string
+        room :
+          type: string
+        projection_time:
+          type: string
+          format: time
+      example:
+          id : 1
+          movie : Get Out
+          room : B
+          projection_time: 21h 30mn
+
+
+    Projections:
+      type: object
+      properties:
+        id :
+          type : number
+        movie :
+          type: string
+        room :
+          type: string
+        projection_time:
+          type: string
+          format: time
+      example:
+
+        - id : 1
+          movie : Black Snake
+          room : A
+          projection_time: 10h 15mn
+
+        - id : 2
+          movie : Gru 2
+          room : B
+          projection_time: 16h 20mn
+
+        - id : 3
+          movie : Thor Love and Thunder
+          room : A
+          projection_time: 12h 45mn
+
+    Categories: 
+      type: object
+      properties:
+        id :
+          type: number
+        genre :
+          type: string
+        list:
+          type: array
+          items:
+            $ref : "#/components/schemas/List"
+      example:
+        - id : 1
+          genre : Action
+        - id : 2
+          genre: Comedy
+        - id : 3
+          genre: Fantasy
+    NewCategory:
+      type: object
+      properties:
+        id :
+          type: number
+          example : 4
+        genre :
+          type: string
+          example : Biopic
+        
+
+    Deleted:
+      type: string
+      example : Deleted successfully
+
+
+    Forbidden:
+      type: object
+      properties:
+        code:
+          type: string
+          example: 403_FORBIDDEN
+        message:
+          type: string
+          example: You cannot see the list
+
+
+    BadRequest:
+      type: object
+      properties:
+        code:
+          type: string
+          example: 400_BAD_REQUEST
+        message:
+          type: string
+          example: Invalid parameters
